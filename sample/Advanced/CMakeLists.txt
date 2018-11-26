@@ -17,13 +17,18 @@ set_property( DIRECTORY PROPERTY VS_STARTUP_PROJECT "Advanced" )
 set( realsense2_DIR "C:/Program Files/librealsense2/lib/cmake/realsense2" CACHE PATH "Path to librealsense2 config directory." )
 find_package( realsense2 REQUIRED )
 
+# For RealSense SDK v2.16.4 and previous
+if(NOT realsense2_INCLUDE_DIR)
+  set(realsense2_INCLUDE_DIR ${realsense_INCLUDE_DIR})
+endif()
+
 # OpenCV
 set( OpenCV_DIR "C:/Program Files/opencv/build" CACHE PATH "Path to OpenCV config directory." )
 find_package( OpenCV REQUIRED )
 
 if( realsense2_FOUND AND OpenCV_FOUND )
   # Additional Include Directories
-  include_directories( ${realsense_INCLUDE_DIR} )
+  include_directories( ${realsense2_INCLUDE_DIR} )
   include_directories( ${OpenCV_INCLUDE_DIRS} )
 
   # Additional Dependencies
