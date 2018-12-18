@@ -1,4 +1,6 @@
 #include "realsense.h"
+#include <fstream>
+#include <sstream>
 
 // Constructor
 RealSense::RealSense()
@@ -78,6 +80,16 @@ inline void RealSense::enableAdvancedMode()
         depth_table_control.depthClampMin = 1000; // Min Depth 1.0m
         depth_table_control.depthClampMax = 2000; // Max Depth 2.0m
         advanced_mode.set_depth_table( depth_table_control );
+
+        // e.g. Apply Visual Preset (https://github.com/IntelRealSense/librealsense/wiki/D400-Series-Visual-Presets)
+        /*
+        std::ifstream ifs( "../VisualPresets/BodyScanPreset.json" );
+        if( ifs.is_open() ){
+            std::ostringstream oss;
+            oss << ifs.rdbuf();
+            advanced_mode.load_json( oss.str() );
+        }
+        */
     }
 }
 
