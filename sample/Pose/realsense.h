@@ -5,6 +5,8 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/viz.hpp>
 
+#include "circular_buffer.h"
+
 class RealSense
 {
 private:
@@ -16,7 +18,10 @@ private:
     // Pose Buffer
     rs2::frame pose_frame;
     rs2_pose pose;
+
+    // Viewer
     cv::viz::Viz3d viewer;
+    circular_buffer<cv::Vec3d> position_history;
 
 public:
     // Constructor

@@ -78,6 +78,10 @@ inline void RealSense::initializePose()
     const cv::Vec2d   interval   = cv::Vec2d( 0.1, 0.1 );
     cv::viz::WGrid grid( center, normal, y_axis, resolution, interval, cv::viz::Color::white() );
     viewer.showWidget( "Grid", grid );
+
+    // Create Positon Hisutory
+    constexpr int32_t history_size = 30;
+    position_history = circular_buffer<cv::Vec3d>( history_size );
 }
 
 // Finalize
@@ -124,6 +128,7 @@ void RealSense::draw()
 // Draw Pose
 inline void RealSense::drawPose()
 {
+    // Retrieve Pose from Pose Frame
     pose = pose_frame.as<rs2::pose_frame>().get_pose_data();
 }
 
@@ -137,14 +142,23 @@ void RealSense::show()
 // Show Pose
 inline void RealSense::showPose()
 {
-    constexpr double scale = 100.0;
-    const cv::Vec3d translation = cv::Vec3d( pose.translation.x, pose.translation.y, pose.translation.z ) * scale;
-    std::cout << "T = ( " << pose.translation.x << ", " << pose.translation.y << ", " << pose.translation.z << " )\n";
+    // Retrieve Translation
+    const cv::Vec3d translation = cv::Vec3d( pose.translation.x, pose.translation.y, pose.translation.z ) * 100.0;
+    std::cout << "T = ( " << translation[0] << ", " << translation[1] << ", " << translation[2] << " )\n";
 
+    // Retrieve Rotation
     cv::Vec3d rotation = cv::Vec3d( pose.rotation.x, pose.rotation.y, pose.rotation.z );
-    std::cout << "R = ( " << pose.rotation.x << ", " << pose.rotation.y << ", " << pose.rotation.z  << ", " << pose.rotation.w << " )\n";
+    std::cout << "R = ( " << rotation[0] << ", " << rotation[1] << ", " << rotation[2] << " )\n";
+
+    // Update Position History
+    position_history.push_front( translation );
+
+    // Create Poly Line from Position History
+    std::vector<cv::Vec3d> positions = { position_history.begin(), position_history.end() };
+    cv::Mat poly_line( 1, static_cast<int32_t>( positions.size() ), CV_64FC3, reinterpret_cast<void*>( &positions[0] ) );
 
     // Show Pose
     viewer.showWidget( "CameraPose", cv::viz::WCameraPosition( 0.5 ), cv::Affine3d( rotation, translation ) );
+    viewer.showWidget( "PoseHistory", cv::viz::WPolyLine( poly_line, cv::viz::Viz3d::Color::green() ) );
     viewer.spinOnce();
 }

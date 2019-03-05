@@ -7,7 +7,7 @@ set( CMAKE_CXX_EXTENSIONS OFF )
 
 # Create Project
 project( Sample )
-add_executable( Pose realsense.h realsense.cpp main.cpp )
+add_executable( Pose circular_buffer.h realsense.h realsense.cpp main.cpp )
 
 # Set StartUp Project
 set_property( DIRECTORY PROPERTY VS_STARTUP_PROJECT "Pose" )
