@@ -67,6 +67,9 @@ inline void RealSense::initializePose()
     // Create Window
     viewer = cv::viz::Viz3d( "Pose" );
 
+    // Register Keyboard Callback Function
+    viewer.registerKeyboardCallback( &keyboardCallback, this );
+
     // Show Coordinate System
     //viewer.showWidget( "CoordinateSystem", cv::viz::WCameraPosition::WCameraPosition( 0.5 ) );
 
@@ -83,6 +86,41 @@ inline void RealSense::initializePose()
     constexpr int32_t history_size = 30;
     position_history = circular_buffer<cv::Vec3d>( history_size );
 }
+
+// Keyboard Callback Function
+void RealSense::keyboardCallback( const cv::viz::KeyboardEvent& event, void* cookie )
+{
+    // Exit Viewer when Pressed ESC key
+    if( event.code == 'q' && event.action == cv::viz::KeyboardEvent::Action::KEY_DOWN ){
+        // Retrieve Viewer
+        cv::viz::Viz3d viewer = static_cast< RealSense* >( cookie )->viewer;
+
+        // Close Viewer
+        viewer.close();
+    }
+    // Reset 6DOF Tracking when Pressed 's' key
+    else if( event.code == 'r' && event.action == cv::viz::KeyboardEvent::Action::KEY_DOWN ){
+        std::cout << "reset" << std::endl;
+
+        // Stop Pipeline
+        rs2::pipeline pipeline = static_cast< RealSense* >( cookie )->pipeline;
+        pipeline.stop();
+
+        // Wait a little bit
+        std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
+
+        // ReStart Pipeline
+        pipeline.start();
+
+        // Clear Position History
+        circular_buffer<cv::Vec3d>& position_history = static_cast< RealSense* >( cookie )->position_history;
+        position_history.clear();
+
+        // Reset Viewer
+        cv::viz::Viz3d viewer = static_cast< RealSense* >( cookie )->viewer;
+        viewer.resetCamera();
+    }
+};
 
 // Finalize
 void RealSense::finalize()

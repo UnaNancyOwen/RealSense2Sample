@@ -43,6 +43,9 @@ private:
     // Initialize Pose
     inline void initializePose();
 
+    // Keyboard Callback Function
+    static void keyboardCallback( const cv::viz::KeyboardEvent& event, void* cookie );
+
     // Finalize
     void finalize();
 

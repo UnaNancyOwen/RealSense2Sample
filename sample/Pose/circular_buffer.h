@@ -26,6 +26,11 @@ public:
         deque.push_front( value );
     }
 
+    void clear()
+    {
+        deque.clear();
+    }
+
     typedef typename std::deque<T>::iterator iterator;
     typedef typename std::deque<T>::const_iterator const_iterator;
 
