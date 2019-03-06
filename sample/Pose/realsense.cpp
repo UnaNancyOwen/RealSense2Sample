@@ -193,10 +193,9 @@ inline void RealSense::showPose()
 
     // Create Poly Line from Position History
     std::vector<cv::Vec3d> positions = { position_history.begin(), position_history.end() };
-    cv::Mat poly_line( 1, static_cast<int32_t>( positions.size() ), CV_64FC3, reinterpret_cast<void*>( &positions[0] ) );
 
     // Show Pose
     viewer.showWidget( "CameraPose", cv::viz::WCameraPosition( 0.5 ), cv::Affine3d( rotation, translation ) );
-    viewer.showWidget( "PoseHistory", cv::viz::WPolyLine( poly_line, cv::viz::Viz3d::Color::green() ) );
+    viewer.showWidget( "PoseHistory", cv::viz::WPolyLine( positions, cv::viz::Viz3d::Color::green() ) );
     viewer.spinOnce();
 }
